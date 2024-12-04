@@ -5,23 +5,62 @@ import { FaSearch, FaUser, FaCaretDown, FaShoppingCart } from "react-icons/fa";
 import Flex from "../../designLayouts/Flex";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 import { paginationItems } from "../../../constants";
 
 const HeaderBottom = () => {
   const products = useSelector((state) => state.orebiReducer.products);
   const [show, setShow] = useState(false);
   const [showUser, setShowUser] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState(null); // To store the user ID
+  const [profileData, setProfileData] = useState(null); // To store the fetched profile data
   const navigate = useNavigate();
   const ref = useRef();
+
   useEffect(() => {
     document.body.addEventListener("click", (e) => {
-      if (ref.current.contains(e.target)) {
+      if (ref.current && ref.current.contains(e.target)) {
         setShow(true);
       } else {
         setShow(false);
       }
     });
+
+    // Check if access token exists in local storage
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUsername(decoded.sub); // Assuming `sub` contains the username
+        setUserId(decoded.userId); // Assuming `userId` contains the user's ID
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
   }, [show, ref]);
+
+  // Fetch profile data based on user ID
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (userId) {
+        try {
+          const response = await fetch(`http://localhost:7295/odata/Users/${userId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setProfileData(data);
+          } else {
+            console.error("Failed to fetch profile data");
+          }
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+        }
+      }
+    };
+    fetchProfileData();
+  }, [userId]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -37,6 +76,14 @@ const HeaderBottom = () => {
     );
     setFilteredProducts(filtered);
   }, [searchQuery]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    setIsLoggedIn(false);
+    setUsername("");
+    setShowUser(false);
+    navigate("/");
+  };
 
   return (
     <div className="w-full bg-[#F5F5F3] relative">
@@ -69,10 +116,10 @@ const HeaderBottom = () => {
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
                   Clothes
                 </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400  hover:border-b-white hover:text-white duration-300 cursor-pointer">
+                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
                   Bags
                 </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400  hover:border-b-white hover:text-white duration-300 cursor-pointer">
+                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
                   Home appliances
                 </li>
               </motion.ul>
@@ -105,9 +152,7 @@ const HeaderBottom = () => {
                               item: item,
                             },
                           }
-                        ) &
-                        setShowSearchBar(true) &
-                        setSearchQuery("")
+                        ) & setSearchQuery("")
                       }
                       key={item._id}
                       className="max-w-[600px] h-28 bg-gray-100 mb-3 flex items-center gap-3"
@@ -132,7 +177,7 @@ const HeaderBottom = () => {
           </div>
           <div className="flex gap-4 mt-2 lg:mt-0 items-center pr-6 cursor-pointer relative">
             <div onClick={() => setShowUser(!showUser)} className="flex">
-              <FaUser />
+              {isLoggedIn ? username : <FaUser />}
               <FaCaretDown />
             </div>
             {showUser && (
@@ -142,22 +187,38 @@ const HeaderBottom = () => {
                 transition={{ duration: 0.5 }}
                 className="absolute top-6 left-0 z-50 bg-primeColor w-44 text-[#767676] h-auto p-4 pb-6"
               >
-                <Link to="/signin">
-                  <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                    Login
-                  </li>
-                </Link>
-                <Link onClick={() => setShowUser(false)} to="/signup">
-                  <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                    Sign Up
-                  </li>
-                </Link>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Profile
-                </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400  hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Others
-                </li>
+                {isLoggedIn ? (
+                  <>
+                    <li className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-default">
+                      {username}
+                    </li>
+                    <li
+                      className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-pointer"
+                      onClick={() => navigate("/profile")}
+                    >
+                      Profile
+                    </li>
+                    <li
+                      className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-pointer"
+                      onClick={handleLogout}
+                    >
+                      Log Out
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/signin">
+                      <li className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-pointer">
+                        Login
+                      </li>
+                    </Link>
+                    <Link to="/signup">
+                      <li className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-pointer">
+                        Sign Up
+                      </li>
+                    </Link>
+                  </>
+                )}
               </motion.ul>
             )}
             <Link to="/cart">
