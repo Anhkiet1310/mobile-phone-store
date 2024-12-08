@@ -6,24 +6,32 @@ import ShopSideNav from "../../components/pageProps/shopPage/ShopSideNav";
 
 const Shop = () => {
   const [itemsPerPage, setItemsPerPage] = useState(12);
-  const itemsPerPageFromBanner = (itemsPerPage) => {
-    setItemsPerPage(itemsPerPage);
-  };
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [viewType, setViewType] = useState("grid");
 
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Products" />
-      {/* ================= Products Start here =================== */}
-      <div className="w-full h-full flex pb-20 gap-10">
-        <div className="w-[20%] lgl:w-[25%] hidden mdl:inline-flex h-full">
+      <div className="flex gap-10 pb-20">
+        {/* Sidebar */}
+        <div className="w-1/4 hidden lg:block">
           <ShopSideNav />
         </div>
-        <div className="w-full mdl:w-[80%] lgl:w-[75%] h-full flex flex-col gap-10">
-          <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner} />
-          <Pagination itemsPerPage={itemsPerPage} />
+
+        {/* Main Content */}
+        <div className="w-full lg:w-3/4 flex flex-col gap-10">
+          <ProductBanner
+            itemsPerPageFromBanner={setItemsPerPage}
+            setSelectedBrand={setSelectedBrand}
+            setViewType={setViewType}
+          />
+          <Pagination
+            itemsPerPage={itemsPerPage}
+            selectedBrand={selectedBrand}
+            viewType={viewType}
+          />
         </div>
       </div>
-      {/* ================= Products End here ===================== */}
     </div>
   );
 };
