@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const OrderModal = ({ onClose }) => {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch pending orders for the logged-in user
   useEffect(() => {
@@ -50,7 +52,7 @@ const OrderModal = ({ onClose }) => {
       if (!updateResponse.ok) {
         const errorText = await updateResponse.text();
         console.error("Error marking order as completed:", errorText);
-        alert("Failed to mark order as completed.");
+        navigate("/payment-failure"); // Redirect to failure page
         return;
       }
 
@@ -70,19 +72,20 @@ const OrderModal = ({ onClose }) => {
 
         if (paymentUrl) {
           console.log("Redirecting to payment URL:", paymentUrl);
-          window.open(paymentUrl, "_blank");
+          window.open(paymentUrl, "_blank"); // Open payment URL in a new tab
+          navigate("/payment-success"); // Redirect to success page
         } else {
           console.error("Payment URL not found in response.");
-          alert("Failed to retrieve payment URL.");
+          navigate("/payment-failure"); // Redirect to failure page
         }
       } else {
         const errorText = await paymentResponse.text();
         console.error("Payment API Error:", errorText);
-        alert("Failed to process payment.");
+        navigate("/payment-failure"); // Redirect to failure page
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      alert("An error occurred during the payment process.");
+      navigate("/payment-failure"); // Redirect to failure page
     }
   };
 
