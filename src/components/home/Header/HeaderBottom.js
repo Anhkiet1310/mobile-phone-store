@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HiOutlineMenuAlt4 } from "react-icons/hi";
-import { FaSearch, FaUser, FaCaretDown, FaShoppingCart } from "react-icons/fa";
+import { FaSearch, FaUser, FaCaretDown, FaShoppingCart, FaTimes } from "react-icons/fa";
 import Flex from "../../designLayouts/Flex";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -14,7 +14,6 @@ const HeaderBottom = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState(null); // To store the user ID
-  const [profileData, setProfileData] = useState(null); // To store the fetched profile data
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [productData, setProductData] = useState([]); // To store fetched product data
@@ -72,6 +71,10 @@ const HeaderBottom = () => {
     setSearchQuery(e.target.value);
   };
 
+  const handleClearSearch = () => {
+    setSearchQuery("");
+  };
+
   const handleRedirect = (modelName) => {
     const matchedProduct = productData.find(
       (item) => item.modelName.toLowerCase() === modelName.toLowerCase()
@@ -94,6 +97,7 @@ const HeaderBottom = () => {
     <div className="w-full bg-[#F5F5F3] relative">
       <div className="max-w-container mx-auto">
         <Flex className="flex flex-col lg:flex-row items-start lg:items-center justify-between w-full px-4 pb-4 lg:pb-0 h-full lg:h-24">
+          {/* Shop by Category */}
           <div
             onClick={() => setShow(!show)}
             ref={ref}
@@ -102,6 +106,8 @@ const HeaderBottom = () => {
             <HiOutlineMenuAlt4 className="w-5 h-5" />
             <p className="text-[14px] font-normal">Shop by Category</p>
           </div>
+
+          {/* Search Bar */}
           <div className="relative w-full lg:w-[600px] h-[50px] text-base text-primeColor bg-white flex items-center gap-2 justify-between px-6 rounded-xl">
             <input
               className="flex-1 h-full outline-none placeholder:text-[#C4C4C4] placeholder:text-[14px]"
@@ -110,7 +116,13 @@ const HeaderBottom = () => {
               value={searchQuery}
               placeholder="Search your products here"
             />
-            <FaSearch className="w-5 h-5" />
+            <FaSearch className="w-5 h-5 cursor-pointer" />
+            {searchQuery && (
+              <FaTimes
+                className="w-5 h-5 cursor-pointer text-gray-500 hover:text-black"
+                onClick={handleClearSearch}
+              />
+            )}
             {searchQuery && filteredProducts.length > 0 && (
               <div className="absolute w-full mx-auto h-96 bg-white top-16 left-0 z-50 overflow-y-scroll shadow-2xl scrollbar-hide cursor-pointer">
                 {filteredProducts.map((item) => (
@@ -129,6 +141,8 @@ const HeaderBottom = () => {
               </div>
             )}
           </div>
+
+          {/* User and Cart */}
           <div className="flex gap-4 mt-2 lg:mt-0 items-center pr-6 cursor-pointer relative">
             <div onClick={() => setShowUser(!showUser)} className="flex">
               {isLoggedIn ? username : <FaUser />}
@@ -151,6 +165,18 @@ const HeaderBottom = () => {
                       onClick={() => navigate("/profile")}
                     >
                       Profile
+                    </li>
+                    <li
+                      className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-pointer"
+                      onClick={() => navigate("/orders")}
+                    >
+                      View Orders
+                    </li>
+                    <li
+                      className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-pointer"
+                      onClick={() => navigate("/payment-history")}
+                    >
+                      Payment History
                     </li>
                     <li
                       className="text-gray-400 px-4 py-1 hover:text-white duration-300 cursor-pointer"
