@@ -6,7 +6,6 @@ import Flex from "../../designLayouts/Flex";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import { paginationItems } from "../../../constants";
 
 const HeaderBottom = () => {
   const products = useSelector((state) => state.orebiReducer.products);
@@ -16,8 +15,29 @@ const HeaderBottom = () => {
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState(null); // To store the user ID
   const [profileData, setProfileData] = useState(null); // To store the fetched profile data
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [productData, setProductData] = useState([]); // To store fetched product data
   const navigate = useNavigate();
   const ref = useRef();
+
+  useEffect(() => {
+    // Fetch product data for suggestions
+    const fetchProductData = async () => {
+      try {
+        const response = await fetch("https://localhost:7295/odata/Phone/details");
+        if (response.ok) {
+          const data = await response.json();
+          setProductData(data);
+        } else {
+          console.error("Failed to fetch product data.");
+        }
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+      }
+    };
+    fetchProductData();
+  }, []);
 
   useEffect(() => {
     document.body.addEventListener("click", (e) => {
@@ -28,7 +48,6 @@ const HeaderBottom = () => {
       }
     });
 
-    // Check if access token exists in local storage
     const token = localStorage.getItem("accessToken");
     if (token) {
       try {
@@ -42,40 +61,26 @@ const HeaderBottom = () => {
     }
   }, [show, ref]);
 
-  // Fetch profile data based on user ID
   useEffect(() => {
-    const fetchProfileData = async () => {
-      if (userId) {
-        try {
-          const response = await fetch(`http://localhost:7295/odata/Users/${userId}`);
-          if (response.ok) {
-            const data = await response.json();
-            setProfileData(data);
-          } else {
-            console.error("Failed to fetch profile data");
-          }
-        } catch (error) {
-          console.error("Error fetching profile data:", error);
-        }
-      }
-    };
-    fetchProfileData();
-  }, [userId]);
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [showSearchBar, setShowSearchBar] = useState(false);
+    const filtered = productData.filter((item) =>
+      item.modelName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [searchQuery, productData]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  useEffect(() => {
-    const filtered = paginationItems.filter((item) =>
-      item.productName.toLowerCase().includes(searchQuery.toLowerCase())
+  const handleRedirect = (modelName) => {
+    const matchedProduct = productData.find(
+      (item) => item.modelName.toLowerCase() === modelName.toLowerCase()
     );
-    setFilteredProducts(filtered);
-  }, [searchQuery]);
+    if (matchedProduct) {
+      navigate("/shop", { state: { selectedProductId: matchedProduct.phoneId } });
+    }
+    setSearchQuery("");
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -96,34 +101,6 @@ const HeaderBottom = () => {
           >
             <HiOutlineMenuAlt4 className="w-5 h-5" />
             <p className="text-[14px] font-normal">Shop by Category</p>
-
-            {show && (
-              <motion.ul
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="absolute top-36 z-50 bg-primeColor w-auto text-[#767676] h-auto p-4 pb-6"
-              >
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Accessories
-                </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Furniture
-                </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Electronics
-                </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Clothes
-                </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Bags
-                </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Home appliances
-                </li>
-              </motion.ul>
-            )}
           </div>
           <div className="relative w-full lg:w-[600px] h-[50px] text-base text-primeColor bg-white flex items-center gap-2 justify-between px-6 rounded-xl">
             <input
@@ -134,44 +111,21 @@ const HeaderBottom = () => {
               placeholder="Search your products here"
             />
             <FaSearch className="w-5 h-5" />
-            {searchQuery && (
-              <div
-                className={`w-full mx-auto h-96 bg-white top-16 absolute left-0 z-50 overflow-y-scroll shadow-2xl scrollbar-hide cursor-pointer`}
-              >
-                {searchQuery &&
-                  filteredProducts.map((item) => (
-                    <div
-                      onClick={() =>
-                        navigate(
-                          `/product/${item.productName
-                            .toLowerCase()
-                            .split(" ")
-                            .join("")}`,
-                          {
-                            state: {
-                              item: item,
-                            },
-                          }
-                        ) & setSearchQuery("")
-                      }
-                      key={item._id}
-                      className="max-w-[600px] h-28 bg-gray-100 mb-3 flex items-center gap-3"
-                    >
-                      <img className="w-24" src={item.img} alt="productImg" />
-                      <div className="flex flex-col gap-1">
-                        <p className="font-semibold text-lg">
-                          {item.productName}
-                        </p>
-                        <p className="text-xs">{item.des}</p>
-                        <p className="text-sm">
-                          Price:{" "}
-                          <span className="text-primeColor font-semibold">
-                            ${item.price}
-                          </span>
-                        </p>
-                      </div>
+            {searchQuery && filteredProducts.length > 0 && (
+              <div className="absolute w-full mx-auto h-96 bg-white top-16 left-0 z-50 overflow-y-scroll shadow-2xl scrollbar-hide cursor-pointer">
+                {filteredProducts.map((item) => (
+                  <div
+                    key={item.phoneId}
+                    className="max-w-[600px] h-28 bg-gray-100 mb-3 flex items-center gap-3 px-4"
+                    onClick={() => handleRedirect(item.modelName)}
+                  >
+                    <img className="w-24" src={item.image} alt="productImg" />
+                    <div className="flex flex-col gap-1">
+                      <p className="font-semibold text-lg">{item.modelName}</p>
+                      <p className="text-sm">{item.description}</p>
                     </div>
-                  ))}
+                  </div>
+                ))}
               </div>
             )}
           </div>

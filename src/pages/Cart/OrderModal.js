@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const OrderModal = ({ onClose }) => {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  // Fetch pending orders for the logged-in user
   useEffect(() => {
     const fetchPendingOrders = async () => {
       setLoading(true);
@@ -41,51 +38,59 @@ const OrderModal = ({ onClose }) => {
     fetchPendingOrders();
   }, []);
 
-  // Mark order as completed and redirect to payment
   const markAsCompletedAndPay = async (orderId) => {
     try {
-      console.log(`Marking order ${orderId} as completed...`);
-      const updateResponse = await fetch(`https://localhost:7295/odata/Order/done/${orderId}`, {
-        method: "PUT",
-      });
+      const updateResponse = await fetch(
+        `https://localhost:7295/odata/Order/done/${orderId}`,
+        {
+          method: "PUT",
+        }
+      );
 
       if (!updateResponse.ok) {
         const errorText = await updateResponse.text();
         console.error("Error marking order as completed:", errorText);
-        navigate("/payment-failure"); // Redirect to failure page
+        alert("Failed to mark order as completed.");
         return;
       }
 
-      console.log("Order marked as completed. Proceeding to payment...");
-
-      const paymentResponse = await fetch("https://localhost:7295/api/VnPay/proceed-vnpay-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: `"${orderId}"`, // Send as a raw string
-      });
+      const paymentResponse = await fetch(
+        "https://localhost:7295/api/VnPay/proceed-vnpay-payment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: `"${orderId}"`,
+        }
+      );
 
       if (paymentResponse.ok) {
         const paymentData = await paymentResponse.json();
-        const paymentUrl = paymentData.paymentUrl; // Correctly match the backend response field
+        const paymentUrl = paymentData.paymentUrl;
 
         if (paymentUrl) {
-          console.log("Redirecting to payment URL:", paymentUrl);
-          window.open(paymentUrl, "_blank"); // Open payment URL in a new tab
-          navigate("/payment-success"); // Redirect to success page
+          // Open the VNPAY payment page in a new tab
+          window.open(paymentUrl, "_blank");
+          alert("Redirecting to VNPAY payment page...");
+          
+          // Redirect back to homepage after 5 seconds
+          setTimeout(() => {
+            alert("Payment processed successfully! Redirecting to homepage...");
+            window.location.href = "/";
+          }, 5000);
         } else {
-          console.error("Payment URL not found in response.");
-          navigate("/payment-failure"); // Redirect to failure page
+          console.error("Payment URL is missing in the response.");
+          alert("Failed to retrieve payment URL.");
         }
       } else {
         const errorText = await paymentResponse.text();
         console.error("Payment API Error:", errorText);
-        navigate("/payment-failure"); // Redirect to failure page
+        alert("Failed to process payment.");
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      navigate("/payment-failure"); // Redirect to failure page
+      alert("An error occurred during the payment process.");
     }
   };
 
@@ -113,7 +118,10 @@ const OrderModal = ({ onClose }) => {
         ) : (
           <p>No pending orders found.</p>
         )}
-        <button onClick={onClose} className="mt-4 py-2 px-4 bg-red-500 text-white rounded">
+        <button
+          onClick={onClose}
+          className="mt-4 py-2 px-4 bg-red-500 text-white rounded"
+        >
           Close
         </button>
       </div>
