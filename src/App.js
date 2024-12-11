@@ -28,11 +28,17 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import ForgetPassword from "./pages/ForgetPassword/ForgetPassword";
 import Profile from "./pages/Profile/Profile";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+
 import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure/PaymentFailure";
 import PaymentHistory from "./pages/PaymentHistory/PaymentHistory"; // New Page
 import { jwtDecode } from "jwt-decode";
 import UserOrders from './pages/UserOrders/UserOrders ';
+
+import ManagerDashboardPage from "./pages/ManagerDashboardPage/ManagerDashboardPage";
+import ManagerPhone from "./pages/ManagerPhone/ManagerPhone";
+
+
 
 const Layout = () => {
   return (
@@ -100,6 +106,8 @@ const router = createBrowserRouter(
       <Route path="/verify-account" element={<VerifyAccount />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/forget-password" element={<ForgetPassword />} />
+      <Route path="/dashboard" element={<ManagerDashboardPage />} />
+      <Route path="/managephone" element={<ManagerPhone />} />
     </Route>
   )
 );
