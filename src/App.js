@@ -27,6 +27,9 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import ForgetPassword from "./pages/ForgetPassword/ForgetPassword";
 import Profile from "./pages/Profile/Profile"; // New Profile Page
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import ManagerDashboardPage from "./pages/ManagerDashboardPage/ManagerDashboardPage";
+import ManagerPhone from "./pages/ManagerPhone/ManagerPhone";
+
 
 const Layout = () => {
   return (
@@ -71,6 +74,8 @@ const router = createBrowserRouter(
       <Route path="/verify-account" element={<VerifyAccount />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/forget-password" element={<ForgetPassword />} />
+      <Route path="/dashboard" element={<ManagerDashboardPage />} />
+      <Route path="/managephone" element={<ManagerPhone />} />
     </Route>
   )
 );
