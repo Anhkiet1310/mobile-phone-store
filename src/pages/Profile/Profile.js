@@ -11,6 +11,7 @@ const Profile = () => {
     address: "",
     phoneNumber: "",
   });
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -84,6 +85,30 @@ const Profile = () => {
     }
   };
 
+  const handleImageUpload = async (file) => {
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("https://localhost:7295/api/UploadFile", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEditForm({ ...editForm, image: data.downloadUrl }); // Set the uploaded image URL
+      } else {
+        console.error("Failed to upload image");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (!userData) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -151,21 +176,18 @@ const Profile = () => {
                 />
               </div>
 
-              {/* Image URL */}
+              {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Profile Image URL
+                  Profile Image
                 </label>
                 <input
                   className="w-full p-2 border rounded"
-                  type="text"
-                  placeholder="Enter a valid image URL"
-                  value={editForm.image}
-                  onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e.target.files[0])}
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  If the URL is invalid, a default anonymous avatar will be shown.
-                </p>
+                {uploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
               </div>
 
               {/* Address */}

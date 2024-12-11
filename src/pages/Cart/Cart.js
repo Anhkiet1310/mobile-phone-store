@@ -99,12 +99,6 @@ const Cart = () => {
             >
               Reset cart
             </button>
-            <button
-              onClick={() => setShowModal(true)}
-              className="py-2 px-10 bg-blue-500 text-white font-semibold uppercase hover:bg-blue-700 duration-300"
-            >
-              View Your Order
-            </button>
           </div>
 
           {/* Cart Summary */}
