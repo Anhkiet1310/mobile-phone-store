@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
   createRoutesFromElements,
   Route,
+  useNavigate,
   ScrollRestoration,
 } from "react-router-dom";
 import Footer from "./components/home/Footer/Footer";
@@ -28,19 +29,37 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import ForgetPassword from "./pages/ForgetPassword/ForgetPassword";
 import Profile from "./pages/Profile/Profile";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-
 import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure/PaymentFailure";
-import PaymentHistory from "./pages/PaymentHistory/PaymentHistory"; // New Page
+import PaymentHistory from "./pages/PaymentHistory/PaymentHistory";
+import Dashboard from "./pages/Dashboard/Dashboard"; // Admin Dashboard
 import { jwtDecode } from "jwt-decode";
 import UserOrders from './pages/UserOrders/UserOrders ';
-
-import ManagerDashboardPage from "./pages/ManagerDashboardPage/ManagerDashboardPage";
-import ManagerPhone from "./pages/ManagerPhone/ManagerPhone";
-
-
+import AdminLayout from "./components/AdminLayout/AdminLayout";
+import ManageUsers from "./pages/AdminManage/ManageUsers";
+import ManageProducts from './pages/AdminManage/ManageProducts';
+import ManageOrders from './pages/AdminManage/ManageOrders';
+import ManagePayments from "./pages/AdminManage/ManagePayments";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const Layout = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decoded Token:", decoded); // Debugging step
+        if (decoded.Role === "Admin") {
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, [navigate]);
+
   return (
     <div>
       <Header />
@@ -68,7 +87,6 @@ const getUserIdFromToken = () => {
   return null;
 };
 
-// Pass userId dynamically
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
@@ -90,7 +108,7 @@ const router = createBrowserRouter(
         />
         <Route
           path="/payment-history"
-          element={<PaymentHistory userId={getUserIdFromToken()} />} // New Payment History Route
+          element={<PaymentHistory userId={getUserIdFromToken()} />}
         />
         <Route
           path="/profile"
@@ -101,13 +119,52 @@ const router = createBrowserRouter(
           }
         />
       </Route>
+      {/* Admin Routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <AdminLayout>
+            <Dashboard />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/manage-users"
+        element={
+          <AdminLayout>
+            <ManageUsers />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/manage-products"
+        element={
+          <AdminLayout>
+            <ManageProducts />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/manage-orders"
+        element={
+          <AdminLayout>
+            <ManageOrders />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/manage-payments"
+        element={
+          <AdminLayout>
+            <ManagePayments />
+          </AdminLayout>
+        }
+      />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/verify-account" element={<VerifyAccount />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/forget-password" element={<ForgetPassword />} />
-      <Route path="/dashboard" element={<ManagerDashboardPage />} />
-      <Route path="/managephone" element={<ManagerPhone />} />
     </Route>
   )
 );
