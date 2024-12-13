@@ -218,10 +218,17 @@ const ManageProducts = () => {
 
       {/* Tab Content */}
       {activeTab === "phones" && (
-        <PhonesTable phones={phones} onViewPhoneItems={handleViewPhoneItems} onAddPhone={addPhone} onAddPhoneItem={onAddPhoneItem} onEditPhone={editPhone}/>
+        <PhonesTable
+          phones={phones}
+          models={models} // Pass models data
+          onViewPhoneItems={handleViewPhoneItems}
+          onAddPhone={addPhone}
+          onAddPhoneItem={onAddPhoneItem}
+          onEditPhone={editPhone}
+        />
       )}
       {activeTab === "brands" && <BrandsTable brands={brands} onAddBrand={addBrand} onEditBrand={editBrand} onDeleteBrand={deleteBrand} />}
-      {activeTab === "models" && <ModelsTable models={models} brands={brands} onDeleteModel={deleteModel} onEditModel={editModel} onAddModel={addModel}/>}
+      {activeTab === "models" && <ModelsTable models={models} brands={brands} onDeleteModel={deleteModel} onEditModel={editModel} onAddModel={addModel} />}
 
       {/* Modal for Phone Items */}
       {showModal && (
