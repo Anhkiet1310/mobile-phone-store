@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
+import { FaEdit } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 
 const ModelsTable = ({ models, brands, onAddModel, onEditModel, onDeleteModel }) => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -107,14 +109,14 @@ const ModelsTable = ({ models, brands, onAddModel, onEditModel, onDeleteModel })
                                         className="me-2"
                                         onClick={() => handleEditClick(model)}
                                     >
-                                        Edit
+                                        <FaEdit />
                                     </Button>
                                     <Button
                                         variant="danger"
                                         size="sm"
                                         onClick={() => handleDeleteClick(model.modelId)}
                                     >
-                                        Delete
+                                        <MdDeleteForever />
                                     </Button>
                                 </td>
                             </tr>

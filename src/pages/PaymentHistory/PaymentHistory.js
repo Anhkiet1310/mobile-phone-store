@@ -51,7 +51,24 @@ const PaymentHistory = ({ userId }) => {
       alert("An error occurred while generating the payment URL. Please try again.");
     }
   };
-
+  const handleGenerateOrderUrl = async (orderId) => {
+    try {
+      const response = await fetch(`https://localhost:7295/odata/Order/done/${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      if (response.ok) {
+        const updatedOrder = await response.json();
+        alert(`Order updated successfully: ${JSON.stringify(updatedOrder)}`);
+      } else {
+        const errorText = await response.text(); // Read error message from response
+        alert(`Failed to update order: ${errorText}`);
+      }
+    } catch (error) {
+      alert("An error occurred while updating the order. Please try again.");
+    }
+  };
   if (loading) {
     return <p>Loading payment history...</p>;
   }
@@ -89,7 +106,10 @@ const PaymentHistory = ({ userId }) => {
             {!paymentItem.payment && (
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-                onClick={() => handleGeneratePaymentUrl(paymentItem.orderId)}
+                onClick={() => {
+                  handleGeneratePaymentUrl(paymentItem.orderId);
+                  handleGenerateOrderUrl(paymentItem.orderId);
+                }}
               >
                 Proceed to Payment
               </button>

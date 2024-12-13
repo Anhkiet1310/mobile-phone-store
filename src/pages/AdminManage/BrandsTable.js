@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { FaEdit } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 
 const BrandsTable = ({ brands, onAddBrand, onEditBrand, onDeleteBrand }) => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -80,14 +82,14 @@ const BrandsTable = ({ brands, onAddBrand, onEditBrand, onDeleteBrand }) => {
                   className="me-2"
                   onClick={() => handleEditClick(brand)}
                 >
-                  Edit
+                  <FaEdit />
                 </Button>
                 <Button
                   variant="danger"
                   size="sm"
                   onClick={() => handleDeleteClick(brand.brandId)}
                 >
-                  Delete
+                  <MdDeleteForever />
                 </Button>
               </td>
             </tr>

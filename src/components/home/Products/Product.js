@@ -11,7 +11,7 @@ import { addToCart } from "../../../redux/orebiSlice";
 
 const Product = (props) => {
   const dispatch = useDispatch();
-  const _id = props.productName;
+  const _id = props._id;
   const idString = (_id) => {
     return String(_id).toLowerCase().split(" ").join("");
   };
