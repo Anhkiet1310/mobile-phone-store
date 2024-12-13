@@ -72,15 +72,14 @@ const SignIn = () => {
             <h1 className="font-titleFont text-xl font-medium">Stay signed in for more</h1>
             <p className="text-base">When you sign in, you are with us!</p>
           </div>
-          <div className="w-[300px] flex items-start gap-3">
+          {/* <div className="w-[300px] flex items-start gap-3">
             <span className="text-green-500 mt-1">
               <BsCheckCircleFill />
             </span>
             <p className="text-base text-gray-300">
-              <span className="text-white font-semibold font-titleFont">Get started fast with OREBI</span>
+              <span className="text-white font-semibold font-titleFont">Get started fast with FPT Shop</span>
               <br />
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ab omnis nisi dolor recusandae consectetur!
-            </p>
+The customer himself, the customer will be able to pursue the adipiscing of the company. It will be followed by all but pain to refuse!            </p>
           </div>
           <div className="w-[300px] flex items-start gap-3">
             <span className="text-green-500 mt-1">
@@ -91,8 +90,8 @@ const SignIn = () => {
               <br />
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ab omnis nisi dolor recusandae consectetur!
             </p>
-          </div>
-          <div className="w-[300px] flex items-start gap-3">
+          </div> */}
+          {/* <div className="w-[300px] flex items-start gap-3">
             <span className="text-green-500 mt-1">
               <BsCheckCircleFill />
             </span>
@@ -101,22 +100,13 @@ const SignIn = () => {
               <br />
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ab omnis nisi dolor recusandae consectetur!
             </p>
-          </div>
+          </div> */}
           <div className="flex items-center justify-between mt-10">
             <Link to="/">
-              <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-                © OREBI
-              </p>
+            <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
+              © All rights reserved. Powered by FPT University.
+            </p>
             </Link>
-            <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-              Terms
-            </p>
-            <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-              Privacy
-            </p>
-            <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-              Security
-            </p>
           </div>
         </div>
       </div>
