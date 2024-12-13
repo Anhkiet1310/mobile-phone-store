@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { Tooltip } from "react-tooltip";
+import { IoIosAddCircle } from "react-icons/io";
+import { FaEdit } from "react-icons/fa";
 
 const PhonesTable = ({ phones = [], onViewPhoneItems, onAddPhone, onAddPhoneItem, onEditPhone }) => {
     const [showAddPhoneModal, setShowAddPhoneModal] = useState(false);
@@ -94,6 +96,7 @@ const PhonesTable = ({ phones = [], onViewPhoneItems, onAddPhone, onAddPhoneItem
                         <th style={{ border: "3px solid black" }}>GPU</th>
                         <th style={{ border: "3px solid black" }}>Color</th>
                         <th style={{ border: "3px solid black" }}>Warranty (Months)</th>
+                        <th style={{ border: "3px solid black" }}>Details</th>
                         <th style={{ border: "3px solid black" }}>Actions</th>
                     </tr>
                 </thead>
@@ -130,10 +133,13 @@ const PhonesTable = ({ phones = [], onViewPhoneItems, onAddPhone, onAddPhoneItem
                                 <td style={{ border: "3px solid black" }}>
                                     <i
                                         className="fas fa-eye text-primary me-2"
+                                        size="sm"
                                         style={{ cursor: "pointer" }}
                                         onClick={() => onViewPhoneItems(phone.phoneItems)}
                                     ></i>
                                     <Tooltip content="View Phone Items" place="top" />
+                                </td>
+                                <td style={{ border: "3px solid black" }}>   
                                     <Button
                                         variant="success"
                                         size="sm"
@@ -143,7 +149,7 @@ const PhonesTable = ({ phones = [], onViewPhoneItems, onAddPhone, onAddPhoneItem
                                             setShowAddItemModal(true);
                                         }}
                                     >
-                                        Add Phone Item
+                                        <IoIosAddCircle />
                                     </Button>
                                     <Button
                                         variant="warning"
@@ -151,7 +157,7 @@ const PhonesTable = ({ phones = [], onViewPhoneItems, onAddPhone, onAddPhoneItem
                                         className="ms-2"
                                         onClick={() => handleEditPhone(phone)}
                                     >
-                                        Edit
+                                        <FaEdit />
                                     </Button>
                                 </td>
                             </tr>
