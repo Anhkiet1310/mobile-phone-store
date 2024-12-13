@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Modal, Button, Table } from "react-bootstrap";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null); // For showing order details
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -16,6 +19,18 @@ const ManageOrders = () => {
 
     fetchOrders();
   }, []);
+
+  const handleViewDetails = async (orderId) => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7295/odata/Order/${orderId}`
+      );
+      setSelectedOrder(response.data);
+      setShowDetailsModal(true);
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+    }
+  };
 
   return (
     <div
@@ -56,7 +71,8 @@ const ManageOrders = () => {
             <th>User ID</th>
             <th>Order Date</th>
             <th>Status</th>
-            <th>Total Amount</th>
+            <th>Total Amount (VND)</th>
+            <th>Details</th>
           </tr>
         </thead>
         <tbody>
@@ -89,12 +105,106 @@ const ManageOrders = () => {
                 {order.status}
               </td>
               <td style={{ color: "#f39c12" }}>
-                ${((order.totalAmount || 0) / 1000).toFixed(2)}
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(order.totalAmount)}
+              </td>
+              <td>
+                <Button
+                  variant="info"
+                  size="sm"
+                  onClick={() => handleViewDetails(order.orderId)}
+                >
+                  View Details
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Modal for showing order details */}
+      <Modal
+        show={showDetailsModal}
+        onHide={() => setShowDetailsModal(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Order Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedOrder && (
+            <div>
+              <p>
+                <strong>Order ID:</strong> {selectedOrder.orderId}
+              </p>
+              <p>
+                <strong>User ID:</strong> {selectedOrder.userId}
+              </p>
+              <p>
+                <strong>Order Date:</strong>{" "}
+                {new Date(selectedOrder.orderDate).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedOrder.status}
+              </p>
+              <p>
+                <strong>Total Amount:</strong>{" "}
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(selectedOrder.totalAmount)}
+              </p>
+
+              <h5>Order Items:</h5>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Phone Image</th>
+                    <th>Phone ID</th>
+                    <th>Quantity</th>
+                    <th>Unit Price (VND)</th>
+                    <th>Warranty (Months)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedOrder.orderDetails.map((detail) => (
+                    <tr key={detail.orderDetailId}>
+                      <td>
+                        <img
+                          src={detail.image}
+                          alt={`Phone ${detail.phoneId}`}
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </td>
+                      <td>{detail.phoneId}</td>
+                      <td>{detail.quantity}</td>
+                      <td>
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(detail.unitPrice)}
+                      </td>
+                      <td>{detail.warrantyPeriod || "N/A"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
