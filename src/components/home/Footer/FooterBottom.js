@@ -9,7 +9,7 @@ const FooterBottom = () => {
           <span className="text-md mr-[1px] mt-[2px] md:mt-0 text-center hidden md:inline-flex">
             <AiOutlineCopyright />
           </span>
-          Copyright 2022 | Orebi shopping | All Rights Reserved |
+          Copyright 2024 | FPT shopping | All Rights Reserved |
           <a href="https://fptshop.com.vn/?gad_source=1&gclid=CjwKCAiAxqC6BhBcEiwAlXp45yqss8-EuSEfoxjWs-dVGMZUXucyziLedzGCJAMPqiOOx1K99Q3i1RoC_MAQAvD_BwE" target="_blank" rel="noreferrer">
             <span className="ml-1 font-medium group-hover:text-primeColor">
               Powered by fptshop.com
